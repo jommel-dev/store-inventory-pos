@@ -1,9 +1,9 @@
 <template>
   <q-page>
     <div class="row">
-        <div class="col col-9 q-pa-xs">
+        <div class="col-12 col-md-9 q-pa-xs">
             <div class="row">
-                <div class="col col-12 q-mb-sm">
+                <div class="col-12 q-mb-sm">
                     <q-input dense rounded outlined v-model="text" placeholder="Search Product">
                     <template v-slot:append>
                         <q-icon name="manage_search" color="primary" />
@@ -12,13 +12,14 @@
                 </div>
             </div>
         </div>
-        <div class="col col-3 q-pa-xs text-right">
+        <div class="col-12 col-md-3 q-pa-xs text-right">
             <q-btn 
               size="xs"
               class="q-ml-sm q-pt-sm q-pb-sm"
               unelevated 
               color="positive"
               icon="add_shopping_cart"
+              @click="addItemModal = !addItemModal"
               label="Add Product" 
             />
             <q-btn 
@@ -41,24 +42,28 @@
             </q-card>
         </div>
     </div>
+
+
+    <InventoryModal
+      :modalStatus="addItemModal"  
+      @updateModalStatus="addItemModal = !addItemModal"
+    />
   </q-page>
 </template>
 
 <script>
 
+import InventoryModal from "../components/Modals/InventoryModal.vue"
+
 export default {
   name:"InventoryPage",
+  components:{
+    InventoryModal
+  },
   data(){
     return {
-      tab: 'grocery',
-      cart: [],
-      items: [
-        {
-          itemName: "",
-          price: 1
-
-        }
-      ]
+        addItemModal: false,
+        itemsList: []
     }
   },
 }
