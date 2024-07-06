@@ -1,198 +1,153 @@
 <template>
   <q-page>
     <div class="row">
-      <div class="col-12 col-md-8 q-pa-xs">
+      <div v-show="!showStores" class="col col-xs-12 col-sm-12 col-md-12 q-mb-sm">
         <div class="row">
-          <div class="col col-12 q-mb-sm">
-            <q-input dense rounded outlined v-model="text" placeholder="Search Product">
-              <template v-slot:append>
-                <q-icon name="manage_search" color="primary" />
-              </template>
-            </q-input>
-          </div>
-          <!-- <div class="col col-12">
+          <div
+            v-for="(item, idx) in overviewList"
+            :key="idx"
+            class="col-12 col-xs-12 col-sm-12 col-md-3 q-pa-xs"
+          >
             <q-card
               flat
-              class="my-card bg-grey-3"
+              class="my-card-item"
+              :class="item.color"
+              @click="item.action"
             >
-            <q-tabs
-                  v-model="tab"
-                  dense
-                  align="justify"
-                  inline-label
-                  active-color="grey-10"
-                  active-bg-color="amber-4"
-                >
-                  <q-tab :ripple="false" no-caps name="grocery" icon="shopping_cart" label="Grocery" />
-                  <q-tab :ripple="false" no-caps name="cigarette" icon="smoking_rooms" label="Cigarette" />
-                  <q-tab :ripple="false" no-caps name="essentials" icon="soap" label="Essentials" />
-                  <q-tab :ripple="false" no-caps name="frozengoods" icon="kitchen" label="Frozens" />
-                  <q-tab :ripple="false" no-caps name="medecine" icon="local_pharmacy" label="Medecine" />
-                  <q-tab :ripple="false" no-caps name="beverages" icon="liquor" label="Beverages" />
-                </q-tabs>
-            </q-card>
-          </div> -->
-          <!-- <div class="col col-12 q-mt-sm">
-            <q-card
-              flat
-              class="my-card bg-white"
-            >
-              <q-card-section class="text-center">
-                
+              <q-card-section :class="`bg-${item.icon}`" @click="item.action">
+                <span class="text-bold">{{item.label}} 
+                  <span v-if="item.limit && item.limit !== 'unlimited'">({{`${item.count}/${item.limit}`}})</span>
+                  <span v-if="item.limit && item.limit === 'unlimited'">(Unlimited)</span>
+                </span><br/>
+                <span class="text-caption">{{item.captions}}</span>
               </q-card-section>
             </q-card>
-          </div> -->
+          </div>
         </div>
       </div>
-      <div class="col-12 col-md-4 q-pa-xs">
+      <div v-show="showStores" class="col col-xs-12 col-sm-12 col-md-12 q-mb-sm">
+        <div class="row wrap justify-start items-center content-center">
+          <q-btn
+            round
+            outline
+            color="red"
+            icon="arrow_back"
+            class="q-mr-md"
+            dense
+            @click="() => { this.showStores = !this.showStores }"
+          />
+          <div class="text-h6">My Store List</div>
+        </div>
+       
         <q-card
-          flat
-          class="my-card bg-white"
+          v-for="(item, key) in myStores"
+          class="shadow-5 q-mt-md bg-yellow-1 my-card-item"
+          :key="key"
         >
           <q-card-section>
-            <div class=" q-mb-sm">
-              <q-btn 
-                size="xs"
-                class="q-ml-sm q-pt-sm q-pb-sm" 
-                no-caps 
-                unelevated
-                @click="showScanModal = !showScanModal"
-                label="Scan"
-                color="primary"
-                icon="barcode_reader" 
-              />
-              <q-btn 
-                size="xs"
-                class="q-ml-sm q-pt-sm q-pb-sm" 
-                no-caps 
-                unelevated
-                label="Check"
-                color="primary"
-                icon="local_offer" 
-              />
-              <q-btn 
-                size="xs"
-                class="q-ml-sm q-pt-sm q-pb-sm" 
-                no-caps 
-                unelevated 
-                color="amber-6"
-                icon="credit_card" 
-              />
-              <q-btn 
-                size="xs"
-                class="q-ml-sm q-pt-sm q-pb-sm" 
-                no-caps 
-                unelevated 
-                color="red-6"
-                icon="restart_alt" 
-              />
-            </div>
-
-            <q-separator />
-
-            <q-list>
-              <q-item v-for="(item) in items" :key="item.product.itemNumber">
-                <q-item-section>
-                  <q-item-label class="text-bold">{{item.product.name}}</q-item-label>
-                  <q-item-label class="text-bold" caption lines="2">QTY: {{item.qty}}</q-item-label>
-                </q-item-section>
-                <q-item-section side top>
-                  <q-item-label caption>{{Number(item.product.vatPrice)}}</q-item-label>
-                  <q-item-label class="text-bold" caption>{{computePrice(item.qty, item.product.vatPrice)}}</q-item-label>
-                </q-item-section>
-                <q-item-section side>
-                  <q-btn 
-                    size="xs"
-                    no-caps 
-                    unelevated 
-                    color="red-6"
-                    icon="close" 
-                  />
-                </q-item-section>
-              </q-item>
-            </q-list>
+            <q-icon 
+              name="store" 
+              size="md" 
+              color="green" 
+            />
+            <label class="text-h6 q-ml-sm">{{item.storeName}}</label><br/><br/>
+            
+            <span class="text-caption" >
+              <q-icon name="place" size="xs" color="red" /> <strong> Address:</strong> {{item.address}} <br/>
+              <q-icon name="storefront" size="xs" color="primary" /> <strong>Store Type:</strong> {{item.storeType}}
+            </span>
           </q-card-section>
-
           
         </q-card>
-        <!-- Button Transact -->
-        <div class="text-bold">
-          <q-list padding dense>
-            <q-item>
-              <q-item-section>
-                <q-item-label class="text-bold">Subtotal</q-item-label>
-              </q-item-section>
-              <q-item-section side>
-                <q-item-label >18.00</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item>
-              <q-item-section>
-                <q-item-label class="text-bold">Tax</q-item-label>
-              </q-item-section>
-              <q-item-section side>
-                <q-item-label >2.00</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item>
-              <q-item-section>
-                <q-item-label class="text-bold">Total</q-item-label>
-              </q-item-section>
-              <q-item-section side>
-                <q-item-label >20.00</q-item-label>
-              </q-item-section>
-            </q-item>
-          </q-list>
-        </div>
-        <q-btn class="full-width q-mt-sm" no-caps unelevated rounded color="positive" label="Proceed" icon="receipt_long" />
       </div>
     </div>
 
-    <POSModal 
-      :modalStatus="showScanModal"  
-      @updateModalStatus="showScanModal = !showScanModal"
-      @searchScanProduct="pushToCart"
+    <MenuBottom />
+    <StoreModal
+      :modalStatus="addStoreModal"  
+      @updateModalStatus="addStoreModal = !addStoreModal"
     />
   </q-page>
 </template>
 
 <script>
 import { LocalStorage } from 'quasar'
-import listDocuments from '../firebase/firebase-list';
-import POSModal from '../components/Modals/PosModal.vue'
+import MenuBottom from '../components/Common/MobileMenu.vue'
+import StoreModal from "../components/Modals/AddStoreModal.vue"
+import listDocuments from '../firebase/firebase-list'
 
 export default {
   name:"HomePage",
-  components:{
-    POSModal
+  components: {
+    MenuBottom,
+    StoreModal
   },
   data(){
     return {
-      showScanModal: false,
-      showCheckModal: false,
-      productList: [],
-
-
-      tab: 'grocery',
-      cart: [],
-      items: []
+      showStores: false,
+      addStoreModal: false,
+      enableCreateStore: false,
+      myStores: [],
+      overviewList: [
+        {
+          color: 'bg-yellow-2',
+          icon: 'add',
+          iconBg: 'red-5',
+          count: 0,
+          label: 'Create Store',
+          captions: 'Register you store and branches',
+          captionColor: 'text-blue-14',
+          disable: false,
+          action: () => { this.addStoreModal = true }
+        },
+        {
+          color: 'bg-green-2',
+          icon: 'store',
+          iconBg: 'green-5',
+          count: 0,
+          limit: 1,
+          label: 'View Store',
+          captions: 'All of the Store registered',
+          captionColor: 'text-blue-14',
+          disable: false,
+          action: () => { this.showStores = true }
+        },
+        {
+          color: 'bg-blue-2',
+          icon: 'product',
+          iconBg: 'blue-5',
+          count: '$ 0.00',
+          label: 'My Shared Products',
+          captions: 'All Items and Product records',
+          captionColor: 'text-blue-14',
+          disable: false,
+          action: () => { return false }
+        },
+      ]
     }
   },
   computed:{
+    userData(){
+      const details = LocalStorage.getItem('user')
+      return details;
+    },
     userDetails(){
-        const details = LocalStorage.getItem('user')
-        return details;
-    }
+      const details = LocalStorage.getItem('userDetails')
+      return details;
+    },
   },
   created(){
-    this.fetchSearchList();
+    this.fetchStoreList();
   },
   methods:{
-    async fetchSearchList(){
+    async fetchStoreList(){
       this.$q.loading.show()
+      this.overviewList[1].limit = this.userDetails.maxStoreLimit
       try {
-        const res = await listDocuments(`userInventory/${this.userDetails.uid}/products`)
-        this.productList = res;
+        const res = await listDocuments(`userInventory/${this.userData.uid}/stores`)
+        this.checkCreateStatus(Number(this.overviewList[1].limit), res.length)
+        this.overviewList[1].count = res.length
+        this.myStores = res
         this.$q.loading.hide()
       } catch (error) {
         console.log(error)
@@ -202,30 +157,23 @@ export default {
         });
       }
     },
-
-
-    async pushToCart(data){
-      const filteredProduct = this.productList.filter((el) => {
-        return el.itemNumber === data.itemCode
-      })
-
-      // if item is not yet existing on list
-      let obj = {
-        product: {...filteredProduct[0]},
-        qty: data.quantity
+    fetchStoreLimit(){
+      if(this.userDetails.maxStoreLimit === "unlimited"){
+        this.overviewList[1].limit = 100
+      } else {
+        this.overviewList[1].limit = this.userDetails.maxStoreLimit
       }
-      this.items.push(obj)
-      console.log(filteredProduct)
     },
-    computePrice(qty, price){
-      let amount = (Number(price) * Number(qty))
-      let res = Number(amount).toLocaleString('en-US', {
-        style: 'decimal',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      })
-
-      return res
+    checkCreateStatus(limit, count){
+      if(limit === count){
+        this.overviewList[0].color = "bg-grey-4"
+        this.overviewList[0].disable = true
+        this.overviewList[0].action = () => { return false }
+      } else {
+        this.overviewList[0].color = "bg-yellow-2"
+        this.overviewList[0].disable = false
+        this.overviewList[0].action = () => { this.addStoreModal = true }
+      }
     }
   }
 }
@@ -235,5 +183,29 @@ export default {
 .my-card{
     border-radius: 10px;
     box-shadow: 0px 0px 3px -2px !important;
+}
+.singleImgOpcity{
+  opacity: 0.4;
+}
+.my-card-item{
+  border-radius: 15px;
+}
+.bg-add{
+  background: url(/imgs/add-store.png) no-repeat;
+  background-position: 106% 12%;
+  background-size: 25%;
+  background-repeat: no-repeat;
+}
+.bg-store{
+  background: url(/imgs/shops.png) no-repeat;
+  background-position: 106% 12%;
+  background-size: 25%;
+  background-repeat: no-repeat;
+}
+.bg-product{
+  background: url(/imgs/trolley.png) no-repeat;
+  background-position: 99% 11px;
+  background-size: 20%;
+  background-repeat: no-repeat;
 }
 </style>
