@@ -14,9 +14,8 @@
 
         <q-toolbar-title>
           <a href="/" class="text-white linkCustom">
-            <q-img src="/icons/favicon-96x96.png" width="5%" /> 
-            <span v-if="!isLoggedIn" class="text-bold">Store POS & Inventory</span>
-            <span v-if="isLoggedIn" class="text-bold">{{userDetails.storeName}}</span>
+            <!-- <q-img src="/icons/favicon-96x96.png" width="5%" />  -->
+            <span v-if="!isLoggedIn" class="text-bold">POS Store</span>
           </a>
         </q-toolbar-title>
 
@@ -50,6 +49,8 @@
     <q-page-container>
       <router-view class="q-pa-md" />
     </q-page-container>
+
+    
   </q-layout>
 </template>
 
@@ -60,10 +61,16 @@ import signout from 'src/firebase/firebase-signout'
 
 const linksList = [
   {
+    title: 'Home',
+    caption: 'Dashboard',
+    icon: 'dashboard',
+    link: 'homepage'
+  },
+  {
     title: 'POS',
     caption: 'Point Of Sale',
     icon: 'point_of_sale',
-    link: 'homepage'
+    link: 'pospage'
   },
   {
     title: 'Inventory',
@@ -130,5 +137,14 @@ export default {
 <style scoped>
 .linkCustom {
   text-decoration: none;
+}
+.myMenuBar{
+  padding: 0% !important;
+  border-radius: 35px;
+}
+.activeMenu {
+  border-radius: 50% !important;
+  padding: 10%;
+  background-color: bisque;
 }
 </style>

@@ -2,16 +2,13 @@
     <div class="q-pa-sm">
         <q-dialog persistent v-model="openModal">
             <q-card style="width: 700px; max-width: 80vw;">
-                <q-card-section class="scroll">
-                    <q-input
-                        class="col-12 col-xs-12 col-md-4 q-pa-sm q-mt-sm"
-                        dense
-                        v-model="qty"
-                        label="QUANTITY/SET OF "
-                    />
+                <q-card-section class="scroll text-center">
                     <BarcodeScanner 
                         @setResult="onDecode" 
                     />
+
+                    <label class="text-h5">Item Price:<br/></label>
+                    <label class="text-h5">{{priceScan}}</label>
                 </q-card-section>
                 <q-card-actions align="right">
                     <q-btn flat label="Cancel" color="negative" @click="closeModal" />
@@ -24,7 +21,7 @@
 import BarcodeScanner from '../Common/BarcodeScan.vue'
 
 export default{
-    name: 'POSModal',
+    name: 'POSCheckModal',
     components: {
         BarcodeScanner,
     },
@@ -32,11 +29,15 @@ export default{
         modalStatus: {
             type: Boolean
         },
+        productList: {
+            type: Array,
+            default: []
+        },
     },
     data(){
         return {
             openModal: false,
-            qty: 1,
+            priceScan: "--"
         }
     },
     watch:{
@@ -47,15 +48,26 @@ export default{
     },
     methods: {
         async closeModal(){
-            this.qty = 1
+            this.priceScan = 0.00
             this.$emit('updateModalStatus');
         },
         async onDecode(result){
-            this.$emit('searchScanProduct', {
-                quantity: this.qty,
-                itemCode: result
+            const filteredProduct = this.productList.filter((el) => {
+                return el.itemNumber === result
             })
-            this.closeModal();
+            
+            if(filteredProduct.length > 0){
+                let item = {...filteredProduct[0]};
+
+                this.priceScan = Number(item.vatPrice).toLocaleString('en-US', {
+                    style: 'decimal',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                })
+            } else {
+                this.priceScan = "Item Not Registered"
+            }
+            
         },
         // ending method
     },
